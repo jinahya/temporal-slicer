@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -63,25 +62,91 @@ public class TemporalSlicerTest {
                             );
     }
 
+//    @Test
+//    @Disabled
+//    public void testLocalDateTimeFromNowForYearByMonth() {
+//        final LocalDateTime start = LocalDateTime.now();
+//        final LocalDateTime end = start.plus(1L, ChronoUnit.YEARS);
+//        logger.debug("duration: {}", Duration.between(start, end));
+//        final List<TemporalSlice<LocalDateTime>> slices = TemporalSlicer.slice(
+//                start,
+//                end,
+//                t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
+//                        .with(ChronoField.HOUR_OF_DAY, 0L)
+//                        .with(ChronoField.MINUTE_OF_HOUR, 0L)
+//                        .with(ChronoField.SECOND_OF_MINUTE, 0L)
+//                        .with(ChronoField.MILLI_OF_SECOND, 0L)
+//                        .with(ChronoField.MICRO_OF_SECOND, 0L)
+//                        .with(ChronoField.NANO_OF_SECOND, 0L)
+//                ,
+//                t -> t.plus(1L, ChronoUnit.MONTHS),
+//                UnaryOperator.identity());
+//        for (final TemporalSlice<LocalDateTime> slice : slices) {
+//            logger.debug("slice: {} / {} / {}", slice, slice.getStartInclusive().get(ChronoField.NANO_OF_SECOND), slice.getStartInclusive().get(ChronoField.NANO_OF_SECOND));
+//        }
+//    }
+
     @Test
-    public void testLocalDateTimeFromNowForYearByMonth() {
+    public void testLocalDateTimeFromNowForYearByMonthIncrement() {
+        logger.debug("inc...");
         final LocalDateTime start = LocalDateTime.now();
         final LocalDateTime end = start.plus(1L, ChronoUnit.YEARS);
-        final List<TemporalSlice<LocalDateTime>> list = TemporalSlicer.slice(
+        TemporalSlicer.slice2(
                 start,
                 end,
-                t -> {
-                    return t.with(ChronoField.DAY_OF_MONTH, 1L).with(ChronoField.HOUR_OF_DAY, 0L)
-                            .with(ChronoField.MINUTE_OF_HOUR, 0L).with(ChronoField.SECOND_OF_MINUTE, 0L)
-                            .with(ChronoField.MILLI_OF_SECOND, 0L)
-                            .with(ChronoField.MICRO_OF_SECOND, 0L)
-                            .with(ChronoField.NANO_OF_SECOND, 0L);
-                },
-                t -> {
-                    return t.plus(1L, ChronoUnit.MONTHS);
-                });
-        for (final TemporalSlice<LocalDateTime> slice : list) {
-            logger.debug("slice: {} / {} / {}", slice, slice.getStart().get(ChronoField.NANO_OF_SECOND), slice.getStart().get(ChronoField.NANO_OF_SECOND));
-        }
+//                (t1, t2) -> t1.compareTo(t2) <= 0,
+                TemporalSlicer.<LocalDateTime>natural(),
+                t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
+                        .with(ChronoField.HOUR_OF_DAY, 0L)
+                        .with(ChronoField.MINUTE_OF_HOUR, 0L)
+                        .with(ChronoField.SECOND_OF_MINUTE, 0L)
+                        .with(ChronoField.MILLI_OF_SECOND, 0L)
+                        .with(ChronoField.MICRO_OF_SECOND, 0L)
+                        .with(ChronoField.NANO_OF_SECOND, 0L)
+                ,
+                t -> t.plus(1L, ChronoUnit.MONTHS));
+    }
+
+    @Test
+    public void testLocalDateTimeFromNowForYearByMonthDecrement() {
+        logger.debug("dec...");
+        final LocalDateTime start = LocalDateTime.now();
+        final LocalDateTime end = start.minus(1L, ChronoUnit.YEARS);
+        TemporalSlicer.slice2(
+                start,
+                end,
+                //(t1, t2) -> t2.compareTo(t1) <= 0,
+                TemporalSlicer.<LocalDateTime>natural().negate(),
+                t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
+                        .with(ChronoField.HOUR_OF_DAY, 0L)
+                        .with(ChronoField.MINUTE_OF_HOUR, 0L)
+                        .with(ChronoField.SECOND_OF_MINUTE, 0L)
+                        .with(ChronoField.MILLI_OF_SECOND, 0L)
+                        .with(ChronoField.MICRO_OF_SECOND, 0L)
+                        .with(ChronoField.NANO_OF_SECOND, 0L)
+                        .plus(1L, ChronoUnit.MONTHS)
+                ,
+                t -> t.minus(1L, ChronoUnit.MONTHS));
+    }
+
+    @Test
+    public void testLocalDateTimeFromNowToNow() {
+        final LocalDateTime start = LocalDateTime.now();
+        final LocalDateTime end = start;
+        TemporalSlicer.slice2(
+                start,
+                end,
+                (t1, t2) -> t2.compareTo(t1) < 0,
+//                TemporalSlicer.<LocalDateTime>natural().negate(),
+                t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
+                        .with(ChronoField.HOUR_OF_DAY, 0L)
+                        .with(ChronoField.MINUTE_OF_HOUR, 0L)
+                        .with(ChronoField.SECOND_OF_MINUTE, 0L)
+                        .with(ChronoField.MILLI_OF_SECOND, 0L)
+                        .with(ChronoField.MICRO_OF_SECOND, 0L)
+                        .with(ChronoField.NANO_OF_SECOND, 0L)
+                        .plus(1L, ChronoUnit.MONTHS)
+                ,
+                t -> t.minus(1L, ChronoUnit.MONTHS));
     }
 }
