@@ -3,6 +3,7 @@ package com.github.jinahya.time.temporal;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -134,7 +135,8 @@ public class TemporalSlicer {
 
     public static <T extends Temporal> void slice2(
             final T start, final T end,
-            final BiPredicate<? super T, ? super T> temporalComparator,
+//            final BiPredicate<? super T, ? super T> temporalComparator,
+            final Comparator<? super T> temporalComparator,
             final UnaryOperator<T> startIdentifier, final UnaryOperator<T> endIncrementer) {
         if (start == null) {
             throw new NullPointerException("start is null");
@@ -144,14 +146,14 @@ public class TemporalSlicer {
         }
         T s = startIdentifier.apply(start);
         T e = endIncrementer.apply(s);
-        if (temporalComparator.test(s, start)) {
-            while (temporalComparator.test(e, s)) {
+        if (temporalComparator.compare(s, start) < 0) {
+            while (temporalComparator.compare(e, s) < 0) {
                 e = endIncrementer.apply(e);
             }
             s = start;
         }
         while (true) {
-            if (temporalComparator.test(end, e)) {
+            if (temporalComparator.compare(end, e) <= 0) {
                 final T s1 = s;
                 System.out.printf("%1$S ~ %2$s\n", s1, end);
                 break;

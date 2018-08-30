@@ -94,8 +94,8 @@ public class TemporalSlicerTest {
         TemporalSlicer.slice2(
                 start,
                 end,
-//                (t1, t2) -> t1.compareTo(t2) <= 0,
-                TemporalSlicer.<LocalDateTime>natural(),
+                (t1, t2) -> t1.compareTo(t2),
+//                TemporalSlicer.<LocalDateTime>natural(),
                 t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
                         .with(ChronoField.HOUR_OF_DAY, 0L)
                         .with(ChronoField.MINUTE_OF_HOUR, 0L)
@@ -115,8 +115,8 @@ public class TemporalSlicerTest {
         TemporalSlicer.slice2(
                 start,
                 end,
-                //(t1, t2) -> t2.compareTo(t1) <= 0,
-                TemporalSlicer.<LocalDateTime>natural().negate(),
+                (t1, t2) -> t2.compareTo(t1),
+//                TemporalSlicer.<LocalDateTime>natural().negate(),
                 t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
                         .with(ChronoField.HOUR_OF_DAY, 0L)
                         .with(ChronoField.MINUTE_OF_HOUR, 0L)
@@ -136,7 +136,7 @@ public class TemporalSlicerTest {
         TemporalSlicer.slice2(
                 start,
                 end,
-                (t1, t2) -> t2.compareTo(t1) < 0,
+                (t1, t2) -> t2.compareTo(t1),
 //                TemporalSlicer.<LocalDateTime>natural().negate(),
                 t -> t.with(ChronoField.DAY_OF_MONTH, 1L)
                         .with(ChronoField.HOUR_OF_DAY, 0L)
