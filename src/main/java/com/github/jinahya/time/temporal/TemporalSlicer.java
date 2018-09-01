@@ -2,9 +2,10 @@ package com.github.jinahya.time.temporal;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalUnit;
 import java.util.Comparator;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -12,190 +13,114 @@ import static java.util.logging.Logger.getLogger;
 
 public class TemporalSlicer {
 
-
+    // -----------------------------------------------------------------------------------------------------------------
     private static final Logger logger = getLogger(lookup().lookupClass().getName());
 
-
     // -----------------------------------------------------------------------------------------------------------------
-
-    public static <T extends Temporal & Comparable<? super T>> BiPredicate<? super T, ? super T> natural() {
-        return (t1, t2) -> t1.compareTo(t2) <= 0;
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-
-//    public static <T extends Temporal> void slice(
-//            final T start, final T end,
-//            final BiPredicate<T, T> comparator,
-//            final UnaryOperator<T> discriminator,
-//            final UnaryOperator<T> incrementer,
-//            final BiConsumer<T, T> consumer) {
-//        T s, e;
-//        s = discriminator.apply(start);
-//        System.out.println("first s: " + s);
-//        e = incrementer.apply(s);
-//        if (comparator.test(s, start)) {
-//            s = start;
-//            while (comparator.test(e, s)) {
-//                e = incrementer.apply(e);
-//            }
-//        }
-//        while (true) {
-//            if (comparator.test(end, e)) {
-//                consumer.accept(s, end);
-//                break;
-//            }
-//            consumer.accept(s, e);
-//            s = e;
-//            e = incrementer.apply(e);
-//        }
-//    }
-//
-//    public static <T extends Temporal & Comparable<? super T>> List<TemporalSlice<T>> slice(
-//            final T start, final T end, final UnaryOperator<T> discriminator, final UnaryOperator<T> incrementer) {
-//        logger.info(() -> format(">>>>>: %1$s %2$s %3$d %4$d", start, end, start.get(ChronoField.NANO_OF_SECOND), end.get(ChronoField.NANO_OF_SECOND)));
-//        if (start == null) {
-//            throw new NullPointerException("start is null");
-//        }
-//        if (end == null) {
-//            throw new NullPointerException("end is null");
-//        }
-//        if (start.compareTo(end) > 0) {
-//            throw new IllegalArgumentException("start...");
-//        }
-//        T s = discriminator.apply(start);
-//        if (s.compareTo(start) > 0) {
-//            throw new RuntimeException("discriminator yielded a future temporal(" + s + ") for start(" + start + ")");
-//        }
-//        T e = incrementer.apply(s);
-//        if (e.compareTo(s) < 0) {
-//            throw new RuntimeException("incrementer yielded a past temporal(" + e + ") for " + s);
-//        }
-//        if (s.compareTo(start) < 0) {
-//            while (e.compareTo(s) < 0) {
-//                e = incrementer.apply(e);
-//            }
-//            s = start;
-//        }
-//        final List<TemporalSlice<T>> list = new ArrayList<>();
-//        while (true) {
-//            if (end.compareTo(e) < 0) {
-//                list.add(TemporalSlice.of(s, end));
-//                break;
-//            }
-//            list.add(TemporalSlice.of(s, e));
-//            s = e;
-//            e = incrementer.apply(e);
-//        }
-//        return list;
-//    }
-//
-//    public static <T extends Temporal & Comparable<? super T>> void slice1(
-//            final T start, final T end, final UnaryOperator<T> discriminator, final UnaryOperator<T> incrementer) {
-//        logger.info(() -> format(">>>>>: %1$s %2$s %3$d %4$d", start, end, start.get(ChronoField.NANO_OF_SECOND), end.get(ChronoField.NANO_OF_SECOND)));
-//        if (start == null) {
-//            throw new NullPointerException("start is null");
-//        }
-//        if (end == null) {
-//            throw new NullPointerException("end is null");
-//        }
-//        if (start.compareTo(end) > 0) {
-//            throw new IllegalArgumentException("start...");
-//        }
-//        T s = discriminator.apply(start);
-//        if (s.compareTo(start) > 0) {
-//            throw new RuntimeException("discriminator yielded a future temporal(" + s + ") for start(" + start + ")");
-//        }
-//        T e = incrementer.apply(s);
-//        if (e.compareTo(s) < 0) {
-//            throw new RuntimeException("incrementer yielded a past temporal(" + e + ") for " + s);
-//        }
-//        if (s.compareTo(start) < 0) {
-//            while (e.compareTo(s) < 0) {
-//                e = incrementer.apply(e);
-//            }
-//            s = start;
-//        }
-//        final List<TemporalSlice<T>> list = new ArrayList<>();
-//        while (true) {
-//            if (end.compareTo(e) < 0) {
-//                list.add(TemporalSlice.of(s, end));
-//                break;
-//            }
-//            list.add(TemporalSlice.of(s, e));
-//            s = e;
-//            e = incrementer.apply(e);
-//        }
-//    }
-//
-//    public static <T extends Temporal> void slice2(
-//            final T start, final T end,
-////            final BiPredicate<? super T, ? super T> temporalComparator,
-//            final Comparator<? super T> temporalComparator,
-//            final UnaryOperator<T> startIdentifier, final UnaryOperator<T> endIncrementer) {
-//        if (start == null) {
-//            throw new NullPointerException("start is null");
-//        }
-//        if (end == null) {
-//            throw new NullPointerException("end is null");
-//        }
-//        T s = startIdentifier.apply(start);
-//        T e = endIncrementer.apply(s);
-//        if (temporalComparator.compare(s, start) < 0) {
-//            while (temporalComparator.compare(e, s) < 0) {
-//                e = endIncrementer.apply(e);
-//            }
-//            s = start;
-//        }
-//        while (true) {
-//            if (temporalComparator.compare(end, e) <= 0) {
-//                final T s1 = s;
-//                System.out.printf("%1$S ~ %2$s\n", s1, end);
-//                break;
-//            }
-//            final T s1 = s;
-//            final T e1 = e;
-//            System.out.printf("%1$S ~ %2$s\n", s1, e1);
-//            s = e;
-//            e = endIncrementer.apply(e);
-//        }
-//    }
-
-    public static void slice3(
-            final Temporal start, final Temporal end,
+    private static void slice(
+            final Temporal startInclusive, final Temporal endExclusive,
             final Comparator<? super Temporal> temporalComparator,
             final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
-            final BiConsumer<Temporal, Temporal> consumer) {
-        if (start == null) {
+            final BiConsumer<Temporal, Temporal> sliceConsumer) {
+        if (startInclusive == null) {
             throw new NullPointerException("start is null");
         }
-        if (end == null) {
+        if (endExclusive == null) {
             throw new NullPointerException("end is null");
         }
-        Temporal s = start.with(startAdjuster);
+        if (temporalComparator == null) {
+            throw new NullPointerException("temporalComparator is null");
+        }
+        if (startAdjuster == null) {
+            throw new NullPointerException("startAdjuster is null");
+        }
+        if (endAdjuster == null) {
+            throw new NullPointerException("endAdjuster is null");
+        }
+        if (sliceConsumer == null) {
+            throw new NullPointerException("sliceConsumer is null");
+        }
+        Temporal s = startInclusive.with(startAdjuster);
         Temporal e = s.with(endAdjuster);
-        if (temporalComparator.compare(s, start) < 0) {
-            s = start;
+        if (temporalComparator.compare(s, startInclusive) < 0) {
+            s = startInclusive;
         }
         while (temporalComparator.compare(e, s) < 0) {
             e = e.with(endAdjuster);
         }
-        while (true) {
-            if (temporalComparator.compare(end, e) <= 0) {
-                final Temporal s1 = s;
-                System.out.printf("%1$S ~ %2$s\n", s1, end);
-                break;
-            }
-            final Temporal s1 = s;
-            final Temporal e1 = e;
-            System.out.printf("%1$S ~ %2$s\n", s1, e1);
+        while (temporalComparator.compare(endExclusive, e) > 0) {
+            sliceConsumer.accept(s, e);
             s = e;
             e = e.with(endAdjuster);
-            if (temporalComparator.compare(s, e) > 0) {
-                throw new RuntimeException("adjusted end(" + e + ") < previous end(" + s + ")");
-            }
         }
+        sliceConsumer.accept(s, endExclusive);
     }
 
+    private static <T extends Temporal & Comparable<? super T>> void slice(
+            final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster,
+            final UnaryOperator<T> endAdjuster, final BiConsumer<? super T, ? super T> sliceConsumer) {
+        if (startInclusive == null) {
+            throw new NullPointerException("start is null");
+        }
+        if (endExclusive == null) {
+            throw new NullPointerException("end is null");
+        }
+        if (startAdjuster == null) {
+            throw new NullPointerException("startAdjuster is null");
+        }
+        if (endAdjuster == null) {
+            throw new NullPointerException("endAdjuster is null");
+        }
+        if (sliceConsumer == null) {
+            throw new NullPointerException("sliceConsumer is null");
+        }
+        final Comparator<? super T> temporalComparator
+                = startInclusive.compareTo(endExclusive) < 0 ? Comparator.naturalOrder() : Comparator.reverseOrder();
+        slice(startInclusive,
+              endExclusive,
+              (t1, t2) -> temporalComparator.compare((T) t1, (T) t2),
+              t -> startAdjuster.apply((T) t),
+              t -> endAdjuster.apply((T) t),
+              (t1, t2) -> sliceConsumer.accept((T) t1, (T) t2)
+        );
+    }
+
+    public static <T extends Temporal & Comparable<? super T>> void sliceAdding(
+            final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster, final long amountToAdd,
+            final TemporalUnit unit, final BiConsumer<? super T, ? super T> sliceConsumer) {
+        if (startInclusive == null) {
+            throw new NullPointerException("start is null");
+        }
+        if (endExclusive == null) {
+            throw new NullPointerException("end is null");
+        }
+        if (startInclusive.compareTo(endExclusive) > 0) {
+            throw new IllegalArgumentException(
+                    "startInclusive(" + startInclusive + ") is after than endExclusive(" + endExclusive + ")");
+        }
+        if (amountToAdd < 0L) {
+            throw new IllegalArgumentException("amountToAdd(" + amountToAdd + ") < 0L");
+        }
+        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.plus(amountToAdd, unit), sliceConsumer);
+    }
+
+    public static <T extends Temporal & Comparable<? super T>> void sliceSubtracting(
+            final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster,
+            final long amountToSubtract, final TemporalUnit unit,
+            final BiConsumer<? super T, ? super T> sliceConsumer) {
+        if (startInclusive == null) {
+            throw new NullPointerException("start is null");
+        }
+        if (endExclusive == null) {
+            throw new NullPointerException("end is null");
+        }
+        if (startInclusive.compareTo(endExclusive) < 0) {
+            throw new IllegalArgumentException(
+                    "startInclusive(" + startInclusive + ") is before than endExclusive(" + endExclusive + ")");
+        }
+        if (amountToSubtract < 0L) {
+            throw new IllegalArgumentException("amountToSubtract(" + amountToSubtract + ") < 0L");
+        }
+        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.minus(amountToSubtract, unit), sliceConsumer);
+    }
 }
