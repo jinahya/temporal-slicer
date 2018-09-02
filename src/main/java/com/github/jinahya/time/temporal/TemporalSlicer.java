@@ -86,8 +86,9 @@ public class TemporalSlicer {
     }
 
     public static <T extends Temporal & Comparable<? super T>> void sliceAdding(
-            final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster, final long amountToAdd,
-            final TemporalUnit unit, final BiConsumer<? super T, ? super T> sliceConsumer) {
+            final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster,
+            final long temporalAmount, final TemporalUnit temporalUnit,
+            final BiConsumer<? super T, ? super T> sliceConsumer) {
         if (startInclusive == null) {
             throw new NullPointerException("start is null");
         }
@@ -98,15 +99,16 @@ public class TemporalSlicer {
             throw new IllegalArgumentException(
                     "startInclusive(" + startInclusive + ") is after than endExclusive(" + endExclusive + ")");
         }
-        if (amountToAdd < 0L) {
-            throw new IllegalArgumentException("amountToAdd(" + amountToAdd + ") < 0L");
+        if (temporalAmount < 0L) {
+            throw new IllegalArgumentException("temporalAmount(" + temporalAmount + ") < 0L");
         }
-        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.plus(amountToAdd, unit), sliceConsumer);
+        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.plus(temporalAmount, temporalUnit),
+              sliceConsumer);
     }
 
     public static <T extends Temporal & Comparable<? super T>> void sliceSubtracting(
             final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster,
-            final long amountToSubtract, final TemporalUnit unit,
+            final long temporalAmount, final TemporalUnit temporalUnit,
             final BiConsumer<? super T, ? super T> sliceConsumer) {
         if (startInclusive == null) {
             throw new NullPointerException("start is null");
@@ -118,9 +120,10 @@ public class TemporalSlicer {
             throw new IllegalArgumentException(
                     "startInclusive(" + startInclusive + ") is before than endExclusive(" + endExclusive + ")");
         }
-        if (amountToSubtract < 0L) {
-            throw new IllegalArgumentException("amountToSubtract(" + amountToSubtract + ") < 0L");
+        if (temporalAmount < 0L) {
+            throw new IllegalArgumentException("temporalAmount(" + temporalAmount + ") < 0L");
         }
-        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.minus(amountToSubtract, unit), sliceConsumer);
+        slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.minus(temporalAmount, temporalUnit),
+              sliceConsumer);
     }
 }
