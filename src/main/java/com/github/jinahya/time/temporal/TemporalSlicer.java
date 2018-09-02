@@ -17,11 +17,10 @@ public class TemporalSlicer {
     private static final Logger logger = getLogger(lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static void slice(
-            final Temporal startInclusive, final Temporal endExclusive,
-            final Comparator<? super Temporal> temporalComparator,
-            final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
-            final BiConsumer<Temporal, Temporal> sliceConsumer) {
+    private static void slice(final Temporal startInclusive, final Temporal endExclusive,
+                              final Comparator<? super Temporal> temporalComparator,
+                              final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
+                              final BiConsumer<Temporal, Temporal> sliceConsumer) {
         if (startInclusive == null) {
             throw new NullPointerException("start is null");
         }
@@ -56,6 +55,7 @@ public class TemporalSlicer {
         sliceConsumer.accept(s, endExclusive);
     }
 
+    @SuppressWarnings({"unchecked"})
     private static <T extends Temporal & Comparable<? super T>> void slice(
             final T startInclusive, final T endExclusive, final UnaryOperator<T> startAdjuster,
             final UnaryOperator<T> endAdjuster, final BiConsumer<? super T, ? super T> sliceConsumer) {
