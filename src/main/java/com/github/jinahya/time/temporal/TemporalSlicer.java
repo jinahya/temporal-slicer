@@ -99,6 +99,9 @@ public class TemporalSlicer {
         if (temporalAmount < 0L) {
             throw new IllegalArgumentException("temporalAmount(" + temporalAmount + ") < 0L");
         }
+        if (temporalUnit == null) {
+            throw new NullPointerException("temporalUnit is null");
+        }
         slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.plus(temporalAmount, temporalUnit),
               sliceConsumer);
     }
@@ -119,6 +122,9 @@ public class TemporalSlicer {
         }
         if (temporalAmount < 0L) {
             throw new IllegalArgumentException("temporalAmount(" + temporalAmount + ") < 0L");
+        }
+        if (temporalUnit == null) {
+            throw new NullPointerException("temporalUnit is null");
         }
         slice(startInclusive, endExclusive, startAdjuster, t -> (T) t.minus(temporalAmount, temporalUnit),
               sliceConsumer);
