@@ -1,15 +1,11 @@
 package com.github.jinahya.time.temporal;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -173,7 +169,8 @@ public class TemporalSlicerTest {
                         .with(ChronoField.MICRO_OF_SECOND, 0L)
                         .with(ChronoField.NANO_OF_SECOND, 0L)
                 ,
-                t -> t.plus(1L, ChronoUnit.MONTHS));
+                t -> t.plus(1L, ChronoUnit.MONTHS),
+                (t1, t2) -> System.out.printf("%1$s ~ %2$s\n", t1, t2));
     }
 
     @Test
@@ -197,7 +194,8 @@ public class TemporalSlicerTest {
                         .with(ChronoField.NANO_OF_SECOND, 0L)
                         .plus(1L, ChronoUnit.MONTHS)
                 ,
-                t -> t.minus(1L, ChronoUnit.MONTHS));
+                t -> t.minus(1L, ChronoUnit.MONTHS),
+                (t1, t2) -> System.out.printf("%1$s ~ %2$s\n", t1, t2));
     }
 
     @Test
@@ -212,6 +210,7 @@ public class TemporalSlicerTest {
                 Comparator.comparing(t2 -> ((LocalDateTime) t2)).reversed(),
 //                TemporalSlicer.<LocalDateTime>natural().negate(),
                 t -> t,
-                t -> t);
+                t -> t,
+                (t1, t2) -> System.out.printf("%1$s ~ %2$s\n", t1, t2));
     }
 }

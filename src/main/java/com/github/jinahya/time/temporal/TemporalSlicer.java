@@ -162,40 +162,75 @@ public class TemporalSlicer {
 //        }
 //    }
 
-    public static void slice3(
-            final Temporal start, final Temporal end,
-            final Comparator<? super Temporal> temporalComparator,
-            final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
-            final BiConsumer<Temporal, Temporal> consumer) {
-        if (start == null) {
+    public static void slice3(final Temporal startInclusive, final Temporal endExclusive,
+                              final Comparator<? super Temporal> temporalComparator,
+                              final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
+                              final BiConsumer<Temporal, Temporal> sliceConsumer) {
+        if (startInclusive == null) {
             throw new NullPointerException("start is null");
         }
-        if (end == null) {
+        if (endExclusive == null) {
             throw new NullPointerException("end is null");
         }
-        Temporal s = start.with(startAdjuster);
+        if (temporalComparator == null) {
+            throw new NullPointerException("temporalComparator is null");
+        }
+        if (startAdjuster == null) {
+            throw new NullPointerException("startAdjuster is null");
+        }
+        if (endAdjuster == null) {
+            throw new NullPointerException("endAdjuster is null");
+        }
+        Temporal s = startInclusive.with(startAdjuster);
         Temporal e = s.with(endAdjuster);
-        if (temporalComparator.compare(s, start) < 0) {
-            s = start;
+        if (temporalComparator.compare(s, startInclusive) < 0) {
+            s = startInclusive;
         }
         while (temporalComparator.compare(e, s) < 0) {
             e = e.with(endAdjuster);
         }
-        while (true) {
-            if (temporalComparator.compare(end, e) <= 0) {
-                final Temporal s1 = s;
-                System.out.printf("%1$S ~ %2$s\n", s1, end);
-                break;
-            }
-            final Temporal s1 = s;
-            final Temporal e1 = e;
-            System.out.printf("%1$S ~ %2$s\n", s1, e1);
+        while (temporalComparator.compare(e, endExclusive) < 0) {
+            sliceConsumer.accept(s, e);
             s = e;
             e = e.with(endAdjuster);
-            if (temporalComparator.compare(s, e) > 0) {
-                throw new RuntimeException("adjusted end(" + e + ") < previous end(" + s + ")");
-            }
         }
+        sliceConsumer.accept(s, endExclusive);
+    }
+
+    public static <T extends Temporal & Comparable<? super T>> void slice3(
+            final Temporal startInclusive, final Temporal endExclusive,
+            final Comparator<? super Temporal> temporalComparator,
+            final TemporalAdjuster startAdjuster, final TemporalAdjuster endAdjuster,
+            final BiConsumer<Temporal, Temporal> sliceConsumer) {
+        if (startInclusive == null) {
+            throw new NullPointerException("start is null");
+        }
+        if (endExclusive == null) {
+            throw new NullPointerException("end is null");
+        }
+        if (temporalComparator == null) {
+            throw new NullPointerException("temporalComparator is null");
+        }
+        if (startAdjuster == null) {
+            throw new NullPointerException("startAdjuster is null");
+        }
+        if (endAdjuster == null) {
+            throw new NullPointerException("endAdjuster is null");
+        }
+        Temporal s = startInclusive.with(startAdjuster);
+        Temporal e = s.with(endAdjuster);
+        if (temporalComparator.compare(s, startInclusive) < 0) {
+            s = startInclusive;
+        }
+        while (temporalComparator.compare(e, s) < 0) {
+            e = e.with(endAdjuster);
+        }
+        while (temporalComparator.compare(e, endExclusive) < 0) {
+            sliceConsumer.accept(s, e);
+            s = e;
+            e = e.with(endAdjuster);
+        }
+        sliceConsumer.accept(s, endExclusive);
     }
 
 }
